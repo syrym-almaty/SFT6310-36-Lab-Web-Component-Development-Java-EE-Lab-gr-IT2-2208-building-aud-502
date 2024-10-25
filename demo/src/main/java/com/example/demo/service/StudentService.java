@@ -29,4 +29,14 @@ public class StudentService {
     public void deleteStudent(UUID id) {
         studentRepository.deleteById(id);
     }
+    public Student updateStudent(UUID id, Student updatedStudent) {
+        return studentRepository.findById(id)
+                .map(student -> {
+                    student.setName(updatedStudent.getName());
+                    student.setEmail(updatedStudent.getEmail());
+                    // Add other fields as necessary
+                    return studentRepository.save(student);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id " + id));
+    }
 }
