@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;  // Импортируйте аннотацию
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class StudentController {
     @Operation(summary = "Get All Students", description = "Retrieve a list of all students")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STUDENT')") // Защита метода
     public List<Student> getAllStudents() {
         return studentService.getAllStudents();
     }
@@ -34,6 +36,7 @@ public class StudentController {
         @ApiResponse(responseCode = "400", description = "Invalid input")
     })
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')") // Защита метода
     public Student createStudent(
             @Parameter(description = "Student object to be created", required = true)
             @RequestBody Student student) {
@@ -46,6 +49,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Student not found")
     })
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STUDENT')") // Защита метода
     public Student getStudentById(
             @Parameter(description = "UUID of the student to retrieve", required = true)
             @PathVariable UUID id) {
@@ -58,6 +62,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Student not found")
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')") // Защита метода
     public void deleteStudent(
             @Parameter(description = "UUID of the student to delete", required = true)
             @PathVariable UUID id) {
@@ -65,17 +70,18 @@ public class StudentController {
     }
 
     @Operation(summary = "Update Student", description = "Update an existing student's information")
-@ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Student updated successfully"),
-    @ApiResponse(responseCode = "400", description = "Invalid input data"),
-    @ApiResponse(responseCode = "404", description = "Student not found")
-})
-@PutMapping("/{id}")
-public Student updateStudent(
-        @Parameter(description = "UUID of the student to update", required = true)
-        @PathVariable UUID id,
-        @Parameter(description = "Updated student object", required = true)
-        @RequestBody Student updatedStudent) {
-    return studentService.updateStudent(id, updatedStudent);
-}
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Student updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "404", description = "Student not found")
+    })
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')") // Защита метода
+    public Student updateStudent(
+            @Parameter(description = "UUID of the student to update", required = true)
+            @PathVariable UUID id,
+            @Parameter(description = "Updated student object", required = true)
+            @RequestBody Student updatedStudent) {
+        return studentService.updateStudent(id, updatedStudent);
+    }
 }
