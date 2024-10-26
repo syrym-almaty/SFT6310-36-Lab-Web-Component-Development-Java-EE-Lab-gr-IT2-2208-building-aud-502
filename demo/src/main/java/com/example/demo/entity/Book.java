@@ -5,6 +5,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import org.hibernate.annotations.GenericGenerator;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
 import java.util.UUID;
 
 @Entity
@@ -16,9 +19,15 @@ public class Book {
     @Column(updatable = false, nullable = false)
     private UUID id;
 
+    @NotBlank(message = "Title is mandatory")
     private String title;
+
+    @NotBlank(message = "Author is mandatory")
     private String author;
+
+    @Pattern(regexp = "\\d{13}", message = "ISBN must be 13 digits")
     private String isbn;
+
     private boolean available;
 
     public Book() {}
