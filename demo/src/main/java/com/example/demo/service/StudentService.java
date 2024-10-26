@@ -40,4 +40,18 @@ public class StudentService {
         })
         .orElseThrow(() -> new ResourceNotFoundException("Student not found with id " + id));
     }
+
+    public Double calculateGPA(UUID studentId) {
+        Student student = getStudentById(studentId);
+        if (student == null || student.getGrades() == null || student.getGrades().isEmpty()) {
+            return null;
+        }
+        
+        List<Double> grades = student.getGrades();
+        double sum = 0.0;
+        for (Double grade : grades) {
+            sum += grade;
+        }
+        return sum / grades.size();
+    }
 }
