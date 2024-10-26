@@ -29,4 +29,29 @@ public class StudentService {
     public void deleteStudent(UUID id) {
         studentRepository.deleteById(id);
     }
+
+    public Student updateStudent(UUID id, Student updatedStudent) {
+        return studentRepository.findById(id)
+        .map(student -> {
+            student.setName(updatedStudent.getName());
+            student.setEmail(updatedStudent.getEmail());
+            // Add other fields as necessary
+            return studentRepository.save(student);
+        })
+        .orElseThrow(() -> new ResourceNotFoundException("Student not found with id " + id));
+    }
+
+    public Double calculateGPA(UUID studentId) {
+        Student student = getStudentById(studentId);
+        if (student == null || student.getGrades() == null || student.getGrades().isEmpty()) {
+            return null;
+        }
+        
+        List<Double> grades = student.getGrades();
+        double sum = 0.0;
+        for (Double grade : grades) {
+            sum += grade;
+        }
+        return sum / grades.size();
+    }
 }
