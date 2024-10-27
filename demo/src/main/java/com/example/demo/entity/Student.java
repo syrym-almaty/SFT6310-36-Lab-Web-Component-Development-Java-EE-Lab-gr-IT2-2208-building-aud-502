@@ -1,26 +1,33 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import org.hibernate.annotations.GenericGenerator;
-import java.util.UUID;
+import jakarta.persistence.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+@Table(name = "students")
 public class Student {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-        name = "UUID",
-        strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(columnDefinition = "uuid")
-    private UUID id;
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
     private String email;
+
+    @ManyToMany
+    @JoinTable(
+            name = "course_student",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private Set<Course> courses = new HashSet<>();
+
+    // GPA field
+    private Double gpa;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "student")
+    private Set<Grade> grade = new HashSet<>(); ; // Set to hold the grades
 
     // Constructors
     public Student() {}
@@ -30,12 +37,12 @@ public class Student {
         this.email = email;
     }
 
-    // Getters and Setters
-    public UUID getId() {
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -47,11 +54,37 @@ public class Student {
         this.name = name;
     }
 
-	public String getEmail() {
+    public String getEmail() {
         return email;
     }
 
+    public Set<Course> getCourses() {
+        return courses;
+    }
+
+    public Double getGpa() {
+        return gpa;
+    }
+
+    public Set<Grade> getGrade() {
+        return grade;
+    }
+
+    public Set<Grade> getGrades(){return grade;}
+
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
+    }
+
+    public void setGpa(Double gpa) {
+        this.gpa = gpa;
+    }
+
+    public void setGrade(Set<Grade> grade) {
+        this.grade = grade;
     }
 }
