@@ -1,18 +1,26 @@
 package com.example.demo.controller;
 
+import com.example.demo.entity.User;
+import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // Импортируем аннотацию для авторизации
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/demo")
 @Tag(name = "Demo Controller", description = "This is a demo controller for educational purposes")
 public class DemoController {
+
+    @Autowired
+    private UserService userService;
 
     @Operation(summary = "Say Hello", description = "This endpoint returns a simple greeting message.")
     @ApiResponse(responseCode = "200", description = "Greeting message returned successfully")
@@ -41,14 +49,25 @@ public class DemoController {
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
     @PostMapping("/createUser")
-    public User createUser(
-            @Parameter(description = "User object containing name and email", required = true)
+    public ResponseEntity<User> createUser(
+            @Parameter(description = "User object containing name, email, and password", required = true)
             @RequestBody User user) {
-        return new User(user.getName(), user.getEmail());
+        User newUser = userService.registerUser(user);
+        return ResponseEntity.ok(newUser);
+    }
+
+    @Operation(summary = "Admin Action", description = "This action is restricted to admin users only.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Admin action performed successfully"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
+    @PreAuthorize("hasRole('admin')")
+    @GetMapping("/admin/action")
+    public ResponseEntity<String> adminAction() {
+        return ResponseEntity.ok("This action can only be performed by an admin.");
     }
 }
 
-// A simple POJO class to return a greeting message as JSON
 class Greeting {
     private String message;
     private String note;
@@ -58,7 +77,6 @@ class Greeting {
         this.note = note;
     }
 
-    // Getters and Setters
     public String getMessage() {
         return message;
     }
@@ -76,32 +94,3 @@ class Greeting {
     }
 }
 
-// A simple POJO class representing a User
-class User {
-    private String name;
-    private String email;
-
-    public User() {}
-
-    public User(String name, String email) {
-        this.name = name;
-        this.email = email;
-    }
-
-    // Getters and Setters
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-	public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-}

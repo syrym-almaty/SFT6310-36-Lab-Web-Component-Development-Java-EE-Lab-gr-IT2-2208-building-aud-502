@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -77,5 +78,12 @@ public class StudentController {
             @Parameter(description = "UUID of the student to delete", required = true)
             @PathVariable UUID id) {
         studentService.deleteStudent(id);
+    }
+    @Operation(summary = "Calculate GPA for a student")
+    @ApiResponse(responseCode = "200", description = "GPA calculated successfully")
+    @GetMapping("/{id}/calculateGPA")
+    public ResponseEntity<Double> calculateGPA(@PathVariable UUID id) {
+        double gpa = studentService.calculateGPA(id);
+        return ResponseEntity.ok(gpa);
     }
 }
