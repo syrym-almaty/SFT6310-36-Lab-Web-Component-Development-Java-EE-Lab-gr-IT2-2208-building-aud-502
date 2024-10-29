@@ -28,6 +28,10 @@ public class StudentService {
     }
 
     public Student createStudent(Student student) {
+//        return studentRepository.save(student);
+        if (student.getId() != null && studentRepository.existsById(student.getId())) {
+            throw new IllegalArgumentException("Student with this ID already exists.");
+        }
         return studentRepository.save(student);
     }
 

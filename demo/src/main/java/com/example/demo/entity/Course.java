@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -21,6 +22,7 @@ public class Course {
     private String code;
 
     @ManyToMany(mappedBy = "courses")
+    @JsonBackReference
     private Set<Student> students = new HashSet<>();
 
     private String title;

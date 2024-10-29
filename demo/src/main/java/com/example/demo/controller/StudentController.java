@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Student;
+import com.example.demo.repository.StudentRepository;
 import com.example.demo.service.StudentService;
 import java.util.UUID;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,8 +10,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -21,6 +24,9 @@ public class StudentController {
 
     @Autowired
     private StudentService studentService;
+
+    @Autowired
+    private StudentRepository studentRepository;
 
     @Operation(summary = "Get All Students", description = "Retrieve a list of all students")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list")
@@ -38,6 +44,10 @@ public class StudentController {
     public Student createStudent(
             @Parameter(description = "Student object to be created", required = true)
             @RequestBody Student student) {
+//        return studentService.createStudent(student);
+        if (studentRepository.existsById(student.getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Student with this ID already exists.");
+        }
         return studentService.createStudent(student);
     }
 
