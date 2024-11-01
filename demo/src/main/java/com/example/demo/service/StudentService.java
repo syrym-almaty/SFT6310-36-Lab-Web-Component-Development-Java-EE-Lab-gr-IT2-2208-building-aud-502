@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.Student;
+import com.example.demo.entity.Grade;
 import com.example.demo.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import com.example.demo.exception.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.Set;
 
 @Service
 public class StudentService {
@@ -40,5 +42,26 @@ public class StudentService {
                     return studentRepository.save(student);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with id " + id));
+    }
+
+    public Double getGPAById(UUID id){
+
+        Student student = studentRepository.findById(id).orElse(null);
+
+        if(student == null){
+            throw new ResourceNotFoundException("Student not found with id " + id);
+        }
+
+        Set<Grade> grades = student.getGrades();
+        if (grades.isEmpty()) {
+            return 0.0;
+        }
+
+        Double grades_sum = new Double(0);
+        for (Grade grade : grades){
+            grades_sum += grade.getScore();
+        }
+
+        return grades_sum / grades.size();
     }
 }
